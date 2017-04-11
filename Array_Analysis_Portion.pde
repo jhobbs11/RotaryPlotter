@@ -20,13 +20,11 @@ void setup() {
   //println(surroundingPixels(testImage,500,1));
   println(pixels);
   println(aveSurroundingPixels(pixels));
-  returnImage = processImage(testImage,160);
-  
+  returnImage = processImage(testImage,160);  
 }
 
 void draw() {
   image(returnImage,0,0);
-  
 }
 
 //Function to draw new image, based on sampling from testImage. Int threshold, in 0-255, sets the cutoff value for painting black.
@@ -36,6 +34,7 @@ PImage processImage(PImage img, int threshold) {
   for(int x=0;x<img.width*img.height;x++){
     newImage.pixels[x] = color(255,255,255);
   }
+  img.updatepixels();
   for(int x=0;x<img.width*img.height;){
     //aveDensity determines how far the printer will move before analyzing the next pixel.
     float aveDensity = aveSurroundingPixels(surroundingPixels(img,x,2));
@@ -50,12 +49,9 @@ PImage processImage(PImage img, int threshold) {
     else {
       newImage.pixels[x] = color(255,255,255);
       x = x + dist;
-    }
+    }  
   }
-  img.updatePixels();
-    
-    
-  
+  img.updatePixels();  
   return newImage;
 }
   
