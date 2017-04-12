@@ -7,7 +7,7 @@ void setup() {
   }
 
 void loop() {
-  while (Serial.available() > 0) {
+  //MAY WANT TO ADD CODE HERE TO DELAY OR SEND REQUEST FOR MORE INFO
   getSerial();
   switch(serialData){
   //X-Axis Control
@@ -58,6 +58,7 @@ void loop() {
     case 3: {
       getSerial();
       servomotorstate(serialData);
+    }
   }
 }
 
