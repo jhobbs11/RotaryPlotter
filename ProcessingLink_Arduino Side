@@ -1,0 +1,85 @@
+unsigned long serialData;
+int inByte;
+
+void setup() {
+  Serial.begin(9600);
+  establishContact();
+  }
+
+void loop() {
+  while (Serial.available() > 0) {
+  getSerial();
+  switch(serialData){
+  //X-Axis Control
+  case 1: {
+    getSerial();
+    switch(serialData) {
+    //Forward Direction
+    case 1: {
+      getSerial();
+      XStepForward(serialData);
+      }
+    //Backward Direction
+      case 2: {
+      getSerial();
+      XStepBackward(serialData);
+      }
+    }
+  }
+  //Y-Axis Control
+  case 2: {
+    getSerial();
+    switch(serialData) {
+    //Forward Direction
+    case 1: {
+      getSerial();
+      YStepForward(serialData);
+      }
+    //Backward Direction
+    case 2: {
+      getSerial();
+      YStepBackward(serialData);
+      }
+    }
+  }
+  //Servo Motor Control
+  case 3: {
+    getSerial();
+    switch(serialData) {
+    //Move Servo Motor Up State
+    case 1: {
+      servomotorupstate();
+    }
+    //Move Servo Motor Down State
+    case 2: {
+      servomotordownstate();
+    }
+    //Move Servo Motor Arbitrarily
+    case 3: {
+      getSerial();
+      servomotorstate(serialData);
+  }
+}
+
+//Function to retrieve single number, of any length, separated by "/". It will only return one number. So if the serial input is 12/3/1990, calling get Serial will only return 12. But call it again and you will get 3. And if again you will get 1990.
+long getSerial() {
+  serialData = 0;
+  while (inByte != '/') {
+    inByte = Serial.read();
+    if (inbyte > 0 && inbyte != '/') {
+      serialData = (serialData * 10) + inByte;
+    }
+  }
+  return serialData;
+  inByte = 0;
+}
+
+//Function to let Processing know Arduino done processing command.
+void establishContact() {
+  while (Serial.available() <= 0) {
+    Serial.println("A");
+    delay(100);
+  }
+}
+
+
