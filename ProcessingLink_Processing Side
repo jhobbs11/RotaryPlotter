@@ -1,0 +1,25 @@
+import processing.serial.*
+Serial myPort;
+String val;
+boolean firstContact = false;
+
+void setup() {
+  size(X,X);
+  myPort = new Serial(this, Serial.list()[4]), 9600);
+  myPort.bufferUntil('\n');
+}
+
+void draw() {
+}
+
+void serialEvent(Serial myPort) {
+  val = myPort.readStringUntil('\n');
+  if (val != null) {
+    val = trim(val)
+  }
+  if (firstContact == false) {
+    if (val.equals("A")) {
+      myPort.clear();
+      firstContact = true;
+      
+    
