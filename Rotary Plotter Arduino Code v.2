@@ -32,7 +32,6 @@ int stepsPerDot = (dotBitDepth - 1) * 2;
 int xDots = (xSteps - (xSteps % stepsPerDot)) / stepsPerDot;
 int margin = (xSteps % stepsPerDot) - ((xSteps % stepsPerDot) % 2) / 2;
 
-
 //Declare Servo Motor
 Servo servoMotor;
 
@@ -190,4 +189,49 @@ void servoLoad() {
     servoMotor.write(servoLoadState);
   }
   servoMotor.write(servoUpState);
+}
+
+void xSet(int x) {
+  int reqDelta = x - XStepperPosition;
+  if (reqDelta >= 0) {
+    XStepForward(abs(reqDelta));
+  }
+  else {
+    XStepBackward(abs(reqDelta));
+}
+
+void ySet(int y) {
+  int reqDelta = y - YStepperPosition;
+  if (reqDelta >= 0) {
+    YStepForward(abs(reqDelta));
+  }
+  else {
+    YStepBackward(abs(reqDelta));
+}
+
+void drawDot(int dot, int depth // 0 = white) {
+  int xDotStartingPosition = margin + 1 + (stepsPerDot * (dot - 1));
+  int xDotCenter = xDotStartingPosition + roundDown((stepsPerDot - 1 / 2));
+  xSet xDotCetner;
+  int yDotCenter = YStepperPosition + roundDown((stepsPerDot - 1 / 2));
+  ySet yDotCenter;
+  for(x = 1; x <= depth; x++) {
+    servoMotor.write(servoDownState);
+    XStepForward((2 * x) - 2);
+    YStepForward((2 * x) - 2);
+    XStepBackward((2 * x) - 2);
+    YStepBackward((2 * x) - 2);
+    servoMotor.write(servoUpState);
+    XStepBackward(1);
+    YStepBackward(1);
+  }    
+  switch (depth) {
+    case 6:
+      break;
+    case 5:
+      
+}
+
+int roundDown(int x) {
+  return x - (x % 1);
 }
