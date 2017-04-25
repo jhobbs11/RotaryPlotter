@@ -59,6 +59,12 @@ void loop() {
       getSerial();
       servomotorstate(serialData);
     }
+    //Access Dot Draw Function
+    case 4: {
+      int dot = getSerial();
+      int depth = getSerial();
+      drawDot(dot, depth);
+    }      
   }
 }
 
@@ -67,7 +73,7 @@ long getSerial() {
   serialData = 0;
   while (inByte != '/') {
     inByte = Serial.read();
-    if (inbyte > 0 && inbyte != '/') {
+    if (inbyte >= 0 && inbyte != '/') {
       serialData = (serialData * 10) + inByte;
     }
   }
