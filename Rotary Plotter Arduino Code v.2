@@ -209,7 +209,8 @@ void ySet(int y) {
     YStepBackward(abs(reqDelta));
 }
 
-void drawDot(int dot, int depth // 0 = white) {
+//Draws boxes to specific bit depth; 0 = white
+void drawDot(int dot, int depth) { 
   int xDotStartingPosition = margin + 1 + (stepsPerDot * (dot - 1));
   int xDotCenter = xDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
   xSet xDotCetner;
