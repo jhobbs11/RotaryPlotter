@@ -26,7 +26,7 @@ int servoUpState = 50;
 int servoDownState = 38;
 int servoLoadState = 90;
     //Total number of steps available to X Axis and desired Bit Depth, followed by various things that occur because of this
-int xSteps = 3400; 
+int xSteps = 4420; 
 int dotBitDepth = 6;  
 int stepsPerDot = (dotBitDepth - 1) * 2;
 int xDots = (xSteps - (xSteps % stepsPerDot)) / stepsPerDot;
@@ -211,9 +211,9 @@ void ySet(int y) {
 
 void drawDot(int dot, int depth // 0 = white) {
   int xDotStartingPosition = margin + 1 + (stepsPerDot * (dot - 1));
-  int xDotCenter = xDotStartingPosition + roundDown((stepsPerDot - 1 / 2));
+  int xDotCenter = xDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
   xSet xDotCetner;
-  int yDotCenter = YStepperPosition + roundDown((stepsPerDot - 1 / 2));
+  int yDotCenter = YStepperPosition + roundDown((stepsPerDot - 1) / 2);
   ySet yDotCenter;
   for(x = 1; x <= depth; x++) {
     servoMotor.write(servoDownState);
@@ -225,11 +225,6 @@ void drawDot(int dot, int depth // 0 = white) {
     XStepBackward(1);
     YStepBackward(1);
   }    
-  switch (depth) {
-    case 6:
-      break;
-    case 5:
-      
 }
 
 int roundDown(int x) {
