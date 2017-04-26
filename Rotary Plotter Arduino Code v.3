@@ -39,45 +39,40 @@ void setup() {
 
   //Open Serial Port
   Serial.begin(9600);
-  Serial.println("Begin input:");
+  Serial.println("Hello!");
   
-  //Limit Switch Setup
+  //Set Pin Functions
+    //Limit Switch Setup
   pinMode(limitSwitch, INPUT);
 
-  //X-Axis Stepper Motor Pins
+    //X-Axis Stepper Motor Pins
   pinMode(XStp, OUTPUT);
   pinMode(XDir, OUTPUT);
 
-  //Y-Axis Stepper Motor Pins
+    //Y-Axis Stepper Motor Pins
   pinMode(YStp, OUTPUT);
   pinMode(YDir, OUTPUT);
-  Serial.println("Arduino Pins set");
-
+  
   //Servo Motor Setup and Initial Position
   servoMotor.attach(12);
-  Serial.println("waiting for load");
+  Serial.println("Load piston, then hit the limit switch.");
   servoLoad();  
   
-
   //Set Default State for Stepper Pins. At the moment, only sets Stp to LOW so can initiate step.
-  XStepperPinReset();
-  YStepperPinReset();
-  Serial.println("stepperpins reset");
-  
+  xStepperPinReset();
+  yStepperPinReset();
+    
   //Pull X-Axis Stepper to Home Position
-  YStepForward(1000);
-  YStepBackward(1000);
+  yStepForward(500);
+  yStepBackward(500);
   yStepperPosition = 0;
   Serial.println("Y Ready");
-  XStepForward(1000);
+  xStepForward(1000);
+  xStepBackward(500);
   Serial.println("X Ready");
-
-  while(digitalRead(limitSwitch)) {
-    delay(1);
-  }
   delay(100);
   xStepperReset();
-  Serial.println("Reset Done");
+  Serial.println("Everything's a go!");
 }
 
 //Main Loop that actually executes while MicroController is powered.
@@ -94,15 +89,15 @@ void loop() {
 
 //Define Functions Used in Main Loop
 
-void XStepperPinReset() {
+void xStepperPinReset() {
   digitalWrite(XStp, LOW);
 }
   
-void YStepperPinReset() {
+void yStepperPinReset() {
   digitalWrite(YStp, LOW);
 }
 
-void XStepForward(int y) {
+void xStepForward(int y) {
   digitalWrite(XDir,HIGH);
   for(int x = 0; x < y; x++) {
     digitalWrite(XStp,HIGH);
@@ -113,7 +108,7 @@ void XStepForward(int y) {
   }
 }
 
-void XStepBackward(int y) {
+void xStepBackward(int y) {
   digitalWrite(XDir,LOW);
   for(int x = 0; x < y; x++) {
     digitalWrite(XStp,HIGH);
@@ -125,15 +120,15 @@ void XStepBackward(int y) {
 }
 
 void xStepperReset() {
-  XStepForward(10);
+  xStepForward(10);
   while(digitalRead(limitSwitch)) {
-    XStepBackward(1);
+    xStepBackward(1);
     delay(1);
   }
   xStepperPosition = 0;
 }
 
-void YStepForward(int y) {
+void yStepForward(int y) {
   digitalWrite(YDir,HIGH);
   for(int x = 0; x < y; x++) {
     digitalWrite(YStp,HIGH);
@@ -144,7 +139,7 @@ void YStepForward(int y) {
   }
 }
 
-void YStepBackward(int y) {
+void yStepBackward(int y) {
   digitalWrite(YDir, LOW);
   for(int x = 0; x < y; x++) {
     digitalWrite(YStp,HIGH);
@@ -165,20 +160,20 @@ void servoLoad() {
 void xSet(int x) {
   int reqDelta = x - xStepperPosition;
   if (reqDelta >= 0) {
-    XStepForward(abs(reqDelta));
+    xStepForward(abs(reqDelta));
   }
   else {
-    XStepBackward(abs(reqDelta));
+    xStepBackward(abs(reqDelta));
   }
 }
 
 void ySet(int y) {
   int reqDelta = y - yStepperPosition;
   if (reqDelta >= 0) {
-    YStepForward(abs(reqDelta));
+    yStepForward(abs(reqDelta));
   }
   else {
-    YStepBackward(abs(reqDelta));
+    yStepBackward(abs(reqDelta));
   }
 }
 
@@ -192,18 +187,18 @@ void drawDot(int dot, int depth) {
   for(int x = 1; x <= depth; x++) {
     servoMotor.write(servoDownState);
     delay(100);
-    XStepForward((2 * x) - 2);
+    xStepForward((2 * x) - 2);
     delay(100);
-    YStepForward((2 * x) - 2);
+    yStepForward((2 * x) - 2);
     delay(100);
-    XStepBackward((2 * x) - 2);
+    xStepBackward((2 * x) - 2);
     delay(100);
-    YStepBackward((2 * x) - 2);
+    yStepBackward((2 * x) - 2);
     delay(100);
     servoMotor.write(servoUpState);
-    XStepBackward(1);
+    xStepBackward(1);
     delay(100);
-    YStepBackward(1);
+    yStepBackward(1);
     delay(100);
   }    
 }
