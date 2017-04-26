@@ -79,14 +79,13 @@ void setup() {
 
 //Main Loop that actually executes while MicroController is powered.
 void loop() {
-  drawDot(5,11);
-  drawDot(6,10);
-  drawDot(7,8);
-  drawDot(8,6);
-  drawDot(9,4);
-  drawDot(10,2);
-  drawDot(11,11);
+  for (x = 1, x <= xDots; x++) {
+    drawDot(x,1,x%10)
+  }
   delay(10000);
+  for (x = 1, x <= xDots; x++) {
+    drawDot(x,2,x%10)
+  }
 }
 
 //Define Functions Used in Main Loop
@@ -202,7 +201,7 @@ void drawDot(int xDot, int yDot, int depth) {
     depth = (dotBitDepth - 1);
   }
   int xDotStartingPosition = margin + 1 + (stepsPerDot * (xDot - 1));
-  int yDotStartingPosition = yStepperPosition
+  int yDotStartingPosition = yStepperPosition + (stepsPerDot * (yDot - 1));
   int xDotCenter = xDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
   xSet(xDotCenter);
   int yDotCenter = yDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
