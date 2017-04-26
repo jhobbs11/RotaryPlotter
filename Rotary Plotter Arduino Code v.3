@@ -215,12 +215,13 @@ void drawDot(int xDot, int yDot, int depth) {
     delay(100);
     yStepBackward((2 * x) - 2);
     delay(100);
-    servoMotor.write(servoUpState);
+    //servoMotor.write(servoUpState);
     xStepBackward(1);
     delay(100);
     yStepBackward(1);
     delay(100);
   }
+  servoMotor.write(servoUpState);
   ySet(yDotStartingPosition);
 }
 
