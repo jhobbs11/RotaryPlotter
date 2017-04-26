@@ -198,13 +198,16 @@ void ySet(int y) {
     //Draws boxes to specific bit depth, 0 equals white. Takes X and Y coordinates in the form of "dots", which are just the effective pixel size of the printer; as set in initial values.
 
 void drawDot(int xDot, int yDot, int depth) { 
+  if (depth > (dotBitDepth - 1)) {
+    depth = (dotBitDepth - 1);
+  }
   int xDotStartingPosition = margin + 1 + (stepsPerDot * (xDot - 1));
   int yDotStartingPosition = yStepperPosition
   int xDotCenter = xDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
   xSet(xDotCenter);
   int yDotCenter = yDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
   ySet(yDotCenter);
-  for(int x = 1; x <= depth; x++) {
+  for (int x = 1; x <= depth; x++) {
     servoMotor.write(servoDownState);
     delay(100);
     xStepForward((2 * x) - 2);
