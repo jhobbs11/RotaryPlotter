@@ -5,11 +5,11 @@
   //Limit Switch used to determine X-axis position of motor.
 #define limitSwitch 13
   //X-Axis Stepper Motor Pins, note that MS Pathways are not defined because hardwired HIGH off 5v power as desired.
-#define XStp 5
-#define XDir 4
+#define xStp 5
+#define xDir 4
   //Y-Axis Stepper Motor Pins, note that MS Pathways are not defined because hardwired HIGH off 5v power as desired.
-#define YStp 3
-#define YDir 2
+#define yStp 3
+#define yDir 2
 
 //Declare Servo Motor
 Servo servoMotor;
@@ -21,6 +21,8 @@ char user_input;
 int xStepperPosition;
 int yStepperPosition;
 int servoPosition;
+  //Sets the delay, in microseconds, between pulses to Stepper Motors.
+int stepperDelayTime = 500
 
   //Manual Inputs of Appropriate Values for various hardware components
     //Servo state variables set the height of the piston necessary for various functions.
@@ -46,12 +48,12 @@ void setup() {
   pinMode(limitSwitch, INPUT);
 
     //X-Axis Stepper Motor Pins
-  pinMode(XStp, OUTPUT);
-  pinMode(XDir, OUTPUT);
+  pinMode(xStp, OUTPUT);
+  pinMode(xDir, OUTPUT);
 
     //Y-Axis Stepper Motor Pins
-  pinMode(YStp, OUTPUT);
-  pinMode(YDir, OUTPUT);
+  pinMode(yStp, OUTPUT);
+  pinMode(yDir, OUTPUT);
   
   //Servo Motor Setup and Initial Position
   servoMotor.attach(12);
@@ -89,36 +91,20 @@ void loop() {
 
 //Define Functions Used in Main Loop
 
+  //STARTUP FUCTIONS
+  
+    //Resets Stepper Motor Pins so they can be triggered in movement calls. Ensures they are in proper default state.
+
 void xStepperPinReset() {
-  digitalWrite(XStp, LOW);
+  digitalWrite(xStp, LOW);
 }
   
 void yStepperPinReset() {
-  digitalWrite(YStp, LOW);
+  digitalWrite(yStp, LOW);
 }
 
-void xStepForward(int y) {
-  digitalWrite(XDir,HIGH);
-  for(int x = 0; x < y; x++) {
-    digitalWrite(XStp,HIGH);
-    delay(1);
-    digitalWrite(XStp,LOW);
-    delay(1);
-    xStepperPosition = xStepperPosition + 1;
-  }
-}
-
-void xStepBackward(int y) {
-  digitalWrite(XDir,LOW);
-  for(int x = 0; x < y; x++) {
-    digitalWrite(XStp,HIGH);
-    delay(1);
-    digitalWrite(XStp,LOW);
-    delay(1);
-    xStepperPosition = xStepperPosition - 1;
-  }
-}
-
+    //Moves X-Axis to home position and sets tracker value.
+    
 void xStepperReset() {
   xStepForward(10);
   while(digitalRead(limitSwitch)) {
@@ -128,28 +114,8 @@ void xStepperReset() {
   xStepperPosition = 0;
 }
 
-void yStepForward(int y) {
-  digitalWrite(YDir,HIGH);
-  for(int x = 0; x < y; x++) {
-    digitalWrite(YStp,HIGH);
-    delay(1);
-    digitalWrite(YStp,LOW);
-    delay(1);
-    yStepperPosition = yStepperPosition + 1;
-  }
-}
-
-void yStepBackward(int y) {
-  digitalWrite(YDir, LOW);
-  for(int x = 0; x < y; x++) {
-    digitalWrite(YStp,HIGH);
-    delay(1);
-    digitalWrite(YStp,LOW);
-    delay(1);
-    yStepperPosition = yStepperPosition - 1;
-  }
-}
-
+    //Startup Function allowing loading of the printer piston.
+    
 void servoLoad() {
   while(digitalRead(limitSwitch)){
     servoMotor.write(servoLoadState);
@@ -157,13 +123,65 @@ void servoLoad() {
   servoMotor.write(servoUpState);
 }
 
+  //BASIC FUNCTIONS THAT ACTUALLY MOVE THE STEPPER MOTORS. FOUR FUNCTIONS, X AND Y AXIS AND FORWARD AND BACKWARD MOTION FOR EACH.
+
+void xStepForward(int y) {
+  digitalWrite(xDir,HIGH);
+  for(int x = 0; x < y; x++) {
+    digitalWrite(xStp,HIGH);
+    delayMicroseconds(stepperDelayTime);
+    digitalWrite(xStp,LOW);
+    delayMicroseconds(stepperDelayTime);
+    xStepperPosition = xStepperPosition + 1;
+  }
+}
+
+void xStepBackward(int y) {
+  digitalWrite(xDir,LOW);
+  for(int x = 0; x < y; x++) {
+    digitalWrite(xStp,HIGH);
+    delayMicroseconds(stepperDelayTime);
+    digitalWrite(xStp,LOW);
+    delayMicroseconds(stepperDelayTime);
+    xStepperPosition = xStepperPosition - 1;
+  }
+}
+
+void yStepForward(int y) {
+  digitalWrite(yDir,HIGH);
+  for(int x = 0; x < y; x++) {
+    digitalWrite(yStp,HIGH);
+    delayMicroseconds(stepperDelayTime);
+    digitalWrite(yStp,LOW);
+    delayMicroseconds(stepperDelayTime);
+    yStepperPosition = yStepperPosition + 1;
+  }
+}
+
+void yStepBackward(int y) {
+  digitalWrite(yDir, LOW);
+  for(int x = 0; x < y; x++) {
+    digitalWrite(yStp,HIGH);
+    delayMicroseconds(stepperDelayTime);
+    digitalWrite(yStp,LOW);
+    delayMicroseconds(stepperDelayTime);
+    yStepperPosition = yStepperPosition - 1;
+  }
+}
+
+  //DERIVATIVE MOVEMENT FUNCTIONS. DRAW ON BASIC MOVEMENT FUNCTIONS FOR ADDITIONAL FUNCTIONALITIES.
+
+    //xSet() and ySet() simply move to a given position. xSet() has built in limitations so won't go beyond available area, aka xSteps.
+
 void xSet(int x) {
   int reqDelta = x - xStepperPosition;
-  if (reqDelta >= 0) {
-    xStepForward(abs(reqDelta));
-  }
-  else {
-    xStepBackward(abs(reqDelta));
+  if (x <= xSteps) {
+    if (reqDelta >= 0) {
+      xStepForward(abs(reqDelta));
+    }
+    else {
+      xStepBackward(abs(reqDelta));
+    }
   }
 }
 
@@ -177,12 +195,14 @@ void ySet(int y) {
   }
 }
 
-//Draws boxes to specific bit depth, 0 equals white
-void drawDot(int dot, int depth) { 
-  int xDotStartingPosition = margin + 1 + (stepsPerDot * (dot - 1));
+    //Draws boxes to specific bit depth, 0 equals white. Takes X and Y coordinates in the form of "dots", which are just the effective pixel size of the printer; as set in initial values.
+
+void drawDot(int xDot, int yDot, int depth) { 
+  int xDotStartingPosition = margin + 1 + (stepsPerDot * (xDot - 1));
+  int yDotStartingPosition = yStepperPosition
   int xDotCenter = xDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
   xSet(xDotCenter);
-  int yDotCenter = yStepperPosition + roundDown((stepsPerDot - 1) / 2);
+  int yDotCenter = yDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
   ySet(yDotCenter);
   for(int x = 1; x <= depth; x++) {
     servoMotor.write(servoDownState);
@@ -200,7 +220,8 @@ void drawDot(int dot, int depth) {
     delay(100);
     yStepBackward(1);
     delay(100);
-  }    
+  }
+  ySet(yDotStartingPosition);
 }
 
 int roundDown(int x) {
