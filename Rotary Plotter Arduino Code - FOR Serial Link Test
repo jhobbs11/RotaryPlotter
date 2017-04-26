@@ -98,7 +98,12 @@ void loop() {
     1. Up
     2. Down
     3. Load
-  4. 
+    4. Arbitrary
+      (x) amount 0-180
+  4. Dot Draw Function
+    (x) xDot
+      (x) yDot
+        (x) Depth
   delay(100);
   }
 
