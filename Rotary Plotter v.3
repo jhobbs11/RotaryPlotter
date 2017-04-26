@@ -1,0 +1,214 @@
+//Include Servo Motor Control Library
+#include <Servo.h>
+
+//Define pin functions on Arduino
+  //Limit Switch used to determine X-axis position of motor.
+#define limitSwitch 13
+  //X-Axis Stepper Motor Pins.
+#define XStp 5
+#define XDir 4
+    //MS Pathways are not defined because hardwired HIGH as desired
+  //Y-Axis Stepper Motor Pins.
+#define YStp 3
+#define YDir 2
+    //MS Pathways are not defined because hardwired HIGH as desired
+ 
+//Declare variables for functions
+  //Used by Serial Connection to communicate
+char user_input;
+   //Tracks Position of Motors, relative to start times
+int XStepperPosition;
+int YStepperPosition;
+int servoPosition;
+
+  //Manual Inputs of Appropriate Values for various hardware components
+int servoUpState = 70;
+int servoDownState = 55;
+int servoLoadState = 90;
+    //Total number of steps available to X Axis and desired Bit Depth, followed by various things that occur because of this
+int xSteps = 4420; 
+int dotBitDepth = 12;  
+int stepsPerDot = (dotBitDepth - 1) * 2;
+int xDots = (xSteps - (xSteps % stepsPerDot)) / stepsPerDot;
+int margin = (xSteps % stepsPerDot) - ((xSteps % stepsPerDot) % 2) / 2;
+
+//Declare Servo Motor
+Servo servoMotor;
+
+//Setup Functions
+void setup() {
+
+  //Open Serial Port
+  Serial.begin(9600);
+  Serial.println("Begin input:");
+  
+  //Limit Switch Setup
+  pinMode(limitSwitch, INPUT);
+
+  //X-Axis Stepper Motor Pins
+  pinMode(XStp, OUTPUT);
+  pinMode(XDir, OUTPUT);
+
+  //Y-Axis Stepper Motor Pins
+  pinMode(YStp, OUTPUT);
+  pinMode(YDir, OUTPUT);
+  Serial.println("Arduino Pins set");
+
+  //Servo Motor Setup and Initial Position
+  servoMotor.attach(12);
+  Serial.println("waiting for load");
+  servoLoad();  
+  
+
+  //Set Default State for Stepper Pins. At the moment, only sets Stp to LOW so can initiate step.
+  XStepperPinReset();
+  YStepperPinReset();
+  Serial.println("stepperpins reset");
+  
+  //Pull X-Axis Stepper to Home Position
+  YStepForward(1000);
+  YStepBackward(1000);
+  YStepperPosition = 0;
+  Serial.println("Y Ready");
+  XStepForward(1000);
+  Serial.println("X Ready");
+
+  while(digitalRead(limitSwitch)) {
+    delay(1);
+  }
+  delay(100);
+  XStepperReset();
+  Serial.println("Reset Done");
+}
+
+//Main Loop that actually executes while MicroController is powered.
+void loop() {
+  drawDot(5,11);
+  drawDot(6,10);
+  drawDot(7,8);
+  drawDot(8,6);
+  drawDot(9,4);
+  drawDot(10,2);
+  drawDot(11,11);
+  delay(10000);
+}
+
+//Define Functions Used in Main Loop
+
+void XStepperPinReset() {
+  digitalWrite(XStp, LOW);
+}
+  
+void YStepperPinReset() {
+  digitalWrite(YStp, LOW);
+}
+
+void XStepForward(int y) {
+  digitalWrite(XDir,HIGH);
+  for(int x = 0; x < y; x++) {
+    digitalWrite(XStp,HIGH);
+    delay(1);
+    digitalWrite(XStp,LOW);
+    delay(1);
+    XStepperPosition = XStepperPosition + 1;
+  }
+}
+
+void XStepBackward(int y) {
+  digitalWrite(XDir,LOW);
+  for(int x = 0; x < y; x++) {
+    digitalWrite(XStp,HIGH);
+    delay(1);
+    digitalWrite(XStp,LOW);
+    delay(1);
+    XStepperPosition = XStepperPosition - 1;
+  }
+}
+
+void XStepperReset() {
+  XStepForward(10);
+  while(digitalRead(limitSwitch)) {
+    XStepBackward(1);
+    delay(1);
+  }
+  XStepperPosition = 0;
+}
+
+void YStepForward(int y) {
+  digitalWrite(YDir,HIGH);
+  for(int x = 0; x < y; x++) {
+    digitalWrite(YStp,HIGH);
+    delay(1);
+    digitalWrite(YStp,LOW);
+    delay(1);
+    YStepperPosition = YStepperPosition + 1;
+  }
+}
+
+void YStepBackward(int y) {
+  digitalWrite(YDir, LOW);
+  for(int x = 0; x < y; x++) {
+    digitalWrite(YStp,HIGH);
+    delay(1);
+    digitalWrite(YStp,LOW);
+    delay(1);
+    YStepperPosition = YStepperPosition - 1;
+  }
+}
+
+void servoLoad() {
+  while(digitalRead(limitSwitch)){
+    servoMotor.write(servoLoadState);
+  }
+  servoMotor.write(servoUpState);
+}
+
+void xSet(int x) {
+  int reqDelta = x - XStepperPosition;
+  if (reqDelta >= 0) {
+    XStepForward(abs(reqDelta));
+  }
+  else {
+    XStepBackward(abs(reqDelta));
+  }
+}
+
+void ySet(int y) {
+  int reqDelta = y - YStepperPosition;
+  if (reqDelta >= 0) {
+    YStepForward(abs(reqDelta));
+  }
+  else {
+    YStepBackward(abs(reqDelta));
+  }
+}
+
+//Draws boxes to specific bit depth, 0 equals white
+void drawDot(int dot, int depth) { 
+  int xDotStartingPosition = margin + 1 + (stepsPerDot * (dot - 1));
+  int xDotCenter = xDotStartingPosition + roundDown((stepsPerDot - 1) / 2);
+  xSet(xDotCenter);
+  int yDotCenter = YStepperPosition + roundDown((stepsPerDot - 1) / 2);
+  ySet(yDotCenter);
+  for(int x = 1; x <= depth; x++) {
+    servoMotor.write(servoDownState);
+    delay(100);
+    XStepForward((2 * x) - 2);
+    delay(100);
+    YStepForward((2 * x) - 2);
+    delay(100);
+    XStepBackward((2 * x) - 2);
+    delay(100);
+    YStepBackward((2 * x) - 2);
+    delay(100);
+    servoMotor.write(servoUpState);
+    XStepBackward(1);
+    delay(100);
+    YStepBackward(1);
+    delay(100);
+  }    
+}
+
+int roundDown(int x) {
+  return x - (x % 1);
+}
