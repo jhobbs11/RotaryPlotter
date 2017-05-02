@@ -28,7 +28,7 @@ void setup() {
     color pixelColor = testImage.pixels[i];
     float greyValue = red(pixelColor);
     int xDot = abs((i%221) - 221);
-    int yDot = rows - ( ( (i+1) + ((i+1) % 221) ) / 221 ) + 1;
+    int yDot = rows + ( ( i - (i%221) ) / 221 ); 
     int depth = 0;
     int delay = 0;
     if (greyValue > 232) {depth=0; delay = 200;} else
