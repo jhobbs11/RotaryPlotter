@@ -27,8 +27,8 @@ int stepperDelayTime = 1000;
 
   //Manual Inputs of Appropriate Values for various hardware components
     //Servo state variables set the height of the piston necessary for various functions.
-int servoUpState = 67;
-int servoDownState = 56;
+int servoUpState = 59;
+int servoDownState = 47;
 int servoLoadState = 90;
     //Manual input of total number of steps available to X Axis and desired Bit Depth, followed by various things that occur because of this
 int xSteps = 4420; 
@@ -42,7 +42,7 @@ void setup() {
 
   //Open Serial Port
   Serial.begin(9600);
-    
+  
   //Set Pin Functions
     //Limit Switch Setup
   pinMode(limitSwitch, INPUT);
@@ -57,7 +57,7 @@ void setup() {
   
   //Servo Motor Setup and Initial Position
   servoMotor.attach(12);
-  Serial.println("Load piston, then hit the limit switch.");
+  //Serial.println("Load piston, then hit the limit switch.");
   servoLoad();  
   
   //Set Default State for Stepper Pins. At the moment, only sets Stp to LOW so can initiate step.
@@ -72,14 +72,14 @@ void setup() {
   xStepBackward(100);
   delay(100);
   xStepperReset();
-  Serial.println("Everything's a go!");
+  Serial.print('!');
 }
 
 //Main Loop that actually executes while MicroController is powered.
 void loop() {
 
-  while (Serial.available() <= 0) {
-    delay(1);
+while (Serial.available() <= 0) {
+  delay(500);
   }
   switch(Serial.read()){
   //X-Axis Control
@@ -151,19 +151,21 @@ void loop() {
       int xDot = Serial.read();
       int yDot = Serial.read();
       int depth = Serial.read();
-      int sumCheck = Serial.ready();
+      int sumCheck = Serial.read();
       while ( (xDot+yDot+depth)%221 != sumCheck) {
-        Serial.println("?");
-        delay(1000);
+        Serial.print('?');
+        while (Serial.available() <= 0) {
+          delay(1);
+        }
         xDot = Serial.read();
         yDot = Serial.read();
         depth = Serial.read();
         sumCheck = Serial.read();
       }
       drawDot(xDot,yDot,depth);
-      Serial.println("!");
+      Serial.print('!');
       break;
-    }      
+    }  
   }
 }
 
