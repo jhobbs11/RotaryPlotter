@@ -15,9 +15,7 @@
 Servo servoMotor;
 
 //Declare variables for functions
-  //Used by Serial Connection to communicate
-unsigned long serialData;
-int inByte;
+
    //Tracks Position of Motors, relative to start times. xStepperPosition initially set via xStepperReset. yStepperPosition set by physicial location on startup.
 int xStepperPosition;
 int yStepperPosition;
@@ -79,7 +77,7 @@ void setup() {
 void loop() {
 
 while (Serial.available() <= 0) {
-  delay(500);
+  delay(1);
   }
   switch(Serial.read()){
   //X-Axis Control
@@ -315,18 +313,3 @@ int roundDown(int x) {
   return x - (x % 1);
 }
 
-  //Serial Functions
-
-    //Function to retrieve single number, of any length, separated by "/". It will only return one number. So if the serial input is 12/3/1990, calling get Serial will only return 12. But call it again and you will get 3. And if again you will get 1990.
-
-long getSerial() {
-  serialData = 0;
-  while (inByte != 'A') {
-    inByte = Serial.read();
-    if (inByte >= 0 && inByte != 'A') {
-      serialData = (serialData * 10) + inByte - '0';
-    }
-}
-  inByte = 0;  
-  return serialData;
-}
