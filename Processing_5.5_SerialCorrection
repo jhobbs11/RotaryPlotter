@@ -55,8 +55,10 @@ void setup() {
     }
     int check = myPort.read();
     while (check != '!') {
-      writeDotDraw(xDot,yDot,depth,sumCheck);
-      println(check);
+      myPort.write(xDot);
+      myPort.write(yDot);
+      myPort.write(depth);
+      myPort.write(sumCheck);
       while (myPort.available() <=0) {
         delay(1);
       }
