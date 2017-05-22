@@ -53,7 +53,7 @@ void setup() {
 //Main Function
 
 void sendPixelData(int i) {
-      color pixelColor = testImage.pixels[i];
+    color pixelColor = testImage.pixels[i];
     float greyValue = red(pixelColor);
     int xDot = abs((i%221) - 221);
     int yDot = rows - ( ( i - (i % 221) ) / 221 ); 
