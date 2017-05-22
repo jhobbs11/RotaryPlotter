@@ -28,16 +28,16 @@ void setup() {
   rows = testImage.height;
   columns = testImage.width;
   
-  for (int r = rows; i > 0; i--) {
+  for (int r = rows; r > 0; r--) {
     if (r % 2 = 0) {
-      for (int c = columns; i > 0; i--) {
-        int pixelLocation = ( r * c ) - 1;
+      for (int c = columns; c >= 1; c--) {
+        int pixelLocation = ( ( ( r - 1 ) * columns) + c - 1 );
         sendPixelData(pixelLocation);
       }
     }
     if (r % 2 = 1) {
-      for (int c = 1; int <= columns; i++) [
-        int pixelLocation = ( r * c ) -1;
+      for (int c = 1; c <= columns; c++) [
+        int pixelLocation = ( ( ( r - 1 ) * columns) + c - 1 );
         sendPixelData(pixelLocation);
       }
     }
@@ -60,9 +60,9 @@ void sendPixelData(int i) {
     int depth = 0;
     //Code for Cropping
     if (xDot < 10 || xDot > 211 || yDot < 10 || yDot > 211) {
-      continue;
+      return;
     }
-    if (greyValue > 232) {depth=0; continue;} else
+    if (greyValue > 232) {depth=0; return;} else
     if (greyValue > 209 && greyValue <=232) {depth=1;} else
     if (greyValue > 186 && greyValue <=209) {depth=2;} else
     if (greyValue > 163 && greyValue <=186) {depth=3;} else
