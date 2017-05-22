@@ -28,8 +28,32 @@ void setup() {
   rows = testImage.height;
   columns = testImage.width;
   
-  for(int i = (testImage.pixels.length - 1); i >= 0; i--) {
-    color pixelColor = testImage.pixels[i];
+  for (int r = rows; i > 0; i--) {
+    if (r % 2 = 0) {
+      for (int c = columns; i > 0; i--) {
+        int pixelLocation = ( r * c ) - 1;
+        sendPixelData(pixelLocation);
+      }
+    }
+    if (r % 2 = 1) {
+      for (int c = 1; int <= columns; i++) [
+        int pixelLocation = ( r * c ) -1;
+        sendPixelData(pixelLocation);
+      }
+    }
+}
+
+
+
+
+
+
+//FUNCTIONS
+
+//Main Function
+
+void sendPixelData(int i) {
+      color pixelColor = testImage.pixels[i];
     float greyValue = red(pixelColor);
     int xDot = abs((i%221) - 221);
     int yDot = rows - ( ( i - (i % 221) ) / 221 ); 
@@ -69,9 +93,8 @@ void setup() {
   }
 }
 
-//FUNCTIONS
 
-  //Serial Functions
+//Serial Functions
 
 void writeDotDraw(int x, int y, int depth, int sumCheck) {
   myPort.write(4);
