@@ -93,6 +93,8 @@ void setup() {
   xStepBackward(100);
   delay(100);
   xStepperReset();
+  xySet(2000,1000);
+  xySet(0,0);
   Serial.print('!');
 }
 
@@ -409,7 +411,9 @@ void ySet(int y) {
 
 void xySet(int x, int y) {
   int xReqDelta = x - xStepperPosition;
+  Serial.println(xReqDelta);
   int yReqDelta = y - yStepperPosition;
+  Serial.println(yReqDelta);
   if (xReqDelta >= 0) {
     digitalWrite(xDir,HIGH);
   }
@@ -425,34 +429,34 @@ void xySet(int x, int y) {
   xReqDelta = abs(xReqDelta);
   yReqDelta = abs(yReqDelta);
   if (xReqDelta >= yReqDelta) {
-    for(int i = 0, i < xReqDelta;i++) {
+    for(int i = 0; i < xReqDelta;i++) {
     digitalWrite(xStp,HIGH);
     xStepperPosition = xStepperPosition +1;
     if (i < yReqDelta){
       digitalWrite(yStp,HIGH);
       yStepperPosition = yStepperPosition +1;
     }
-    delayMicroseconds(stepperDelayTime);
+    delayMicroseconds(500);
     digitalWrite(xStp,LOW);
     digitalWrite(yStp,LOW);
-    delayMicroseconds(stepperDelayTime);
-    
+    delayMicroseconds(500);
+    }
   }
   else {
-    for(int i = 0, i < yReqDelta;i++) {
+    for(int j = 0; j < yReqDelta;j++) {
     digitalWrite(yStp,HIGH);
     yStepperPosition = yStepperPosition +1;
-    if (i < xReqDelta){
+    if (j < xReqDelta){
       digitalWrite(xStp,HIGH);
       xStepperPosition = xStepperPosition +1;
     }
-    delayMicroseconds(stepperDelayTime);
+    delayMicroseconds(500);
     digitalWrite(xStp,LOW);
     digitalWrite(yStp,LOW);
-    delayMicroseconds(stepperDelayTime);
+    delayMicroseconds(500);
+    }
   }
 }
-  
 
     //Draws boxes to specific bit depth, 0 equals white. Takes X and Y coordinates in the form of "dots", which are just the effective pixel size of the printer; as set in initial values.
 
